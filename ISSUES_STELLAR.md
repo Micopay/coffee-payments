@@ -14,7 +14,7 @@ Formato según `docs/DRIPS_TEAM_GUIDE.md` de `Micopay/micopay-protocol`: problem
 > | Issue | Antes | Ahora |
 > |---|---|---|
 > | [#3](https://github.com/Micopay/coffee-payments/issues/3) | Spike de LOBSTR | Contrato de firma delegada + viabilidad de `htlc-core` para el escrow |
-> | [#12](https://github.com/Micopay/coffee-payments/issues/12) | Endpoints en `backend/` | **Movida** a [micopay-protocol#323](https://github.com/Micopay/micopay-protocol/issues/323); pendiente de cierre |
+> | [#12](https://github.com/Micopay/coffee-payments/issues/12) | Endpoints en `backend/` | **Cerrada** — movida a [micopay-protocol#323](https://github.com/Micopay/micopay-protocol/issues/323) |
 > | [#19](https://github.com/Micopay/coffee-payments/issues/19) | Cliente de LOBSTR | `MicopaySigner` contra `micopay/backend` |
 >
 > Dos issues nuevas en el otro repositorio, donde vive la billetera:
@@ -28,7 +28,7 @@ Formato según `docs/DRIPS_TEAM_GUIDE.md` de `Micopay/micopay-protocol`: problem
 OLA 0 — arranque inmediato, 5 personas en paralelo, sin dependencias
   ├── XLM-01  Spike: pagos en Stellar Testnet
   ├── XLM-02  Spike: escrow con transacciones preautorizadas
-  ├── XLM-03  Spike: firma remota con LOBSTR
+  ├── XLM-03  Contrato de firma MicoPay + viabilidad de htlc-core
   ├── XLM-04  Protocolo LedgerClient + shim de XRPLClient
   └── XLM-06  Modelo de datos multicadena  ← CAMINO CRÍTICO, empezar el día 1
 
@@ -38,8 +38,9 @@ OLA 1 — 6 en paralelo
   ├── XLM-08  Alta de direcciones Stellar                  [06]
   ├── XLM-09  WalletSession y conexión perezosa            [04, 06]
   ├── XLM-14  Historial, detalle y recibo por red          [06]
-  ├── XLM-15  Métricas de admin por red                    [06]
-  └── XLM-18  Backend: endpoints de firma Stellar          [03]
+  └── XLM-15  Métricas de admin por red                    [06]
+
+      XLM-18  cerrada — vive en micopay-protocol#323
 
 OLA 2 — 4 en paralelo
   ├── XLM-10  Selector de red y pago directo               [05, 06, 07, 09]
@@ -54,7 +55,7 @@ OLA 4
   └── XLM-17  SignDialog genérico + cierre de Fase X5      [13]
 
 OLA 5
-  └── XLM-19  Cliente LOBSTR y cableado en la app          [10, 17, 18]
+  └── XLM-19  MicopaySigner y cableado                     [03, 10, 17, micopay#323/#324]
 
 OLA 6
   └── XLM-20  Limpieza, tests finales y documentación      [todo]
@@ -781,7 +782,7 @@ Los 20 issues están abiertos en [`Micopay/coffee-payments`](https://github.com/
 | 09 | [#9](https://github.com/Micopay/coffee-payments/issues/9) | WalletSession y conexión perezosa | 1 | `frontend` `high` | #4, #5 |
 | 14 | [#10](https://github.com/Micopay/coffee-payments/issues/10) | Historial, detalle y recibo por red | 1 | `frontend` `medium` | #5 |
 | 15 | [#11](https://github.com/Micopay/coffee-payments/issues/11) | Métricas de admin por red | 1 | `frontend` `good first issue` `low` | #5 |
-| 18 | [#12](https://github.com/Micopay/coffee-payments/issues/12) | ⛔ Movida a [micopay#323](https://github.com/Micopay/micopay-protocol/issues/323) — pendiente de cierre | 1 | `backend` `high` | — |
+| ~~18~~ | ~~[#12](https://github.com/Micopay/coffee-payments/issues/12)~~ | ⛔ **Cerrada** — movida a [micopay#323](https://github.com/Micopay/micopay-protocol/issues/323) | — | — | — |
 | 10 | [#13](https://github.com/Micopay/coffee-payments/issues/13) | Selector de red y pago directo en Stellar | 2 | `frontend` `high` | #5, #6, #7, #9 |
 | 11 | [#14](https://github.com/Micopay/coffee-payments/issues/14) | Doble saldo en el dashboard | 2 | `frontend` `good first issue` `medium` | #6, #9 |
 | 12 | [#15](https://github.com/Micopay/coffee-payments/issues/15) | Escrow de Stellar en StellarClient | 2 | `backend` `high` | #2, #5, #6 |
