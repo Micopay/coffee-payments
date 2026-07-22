@@ -7,6 +7,21 @@ Formato según `docs/DRIPS_TEAM_GUIDE.md` de `Micopay/micopay-protocol`: problem
 
 ---
 
+> ## ♻️ Enmienda — 22/07/2026, después de publicar
+>
+> **La billetera de Stellar deja de ser LOBSTR y pasa a ser la app de MicoPay.** Ver la enmienda de [`PLAN_STELLAR.md`](https://github.com/Micopay/coffee-payments/blob/main/PLAN_STELLAR.md) para el razonamiento.
+>
+> | Issue | Antes | Ahora |
+> |---|---|---|
+> | [#3](https://github.com/Micopay/coffee-payments/issues/3) | Spike de LOBSTR | Contrato de firma delegada + viabilidad de `htlc-core` para el escrow |
+> | [#12](https://github.com/Micopay/coffee-payments/issues/12) | Endpoints en `backend/` | **Movida** a [micopay-protocol#323](https://github.com/Micopay/micopay-protocol/issues/323); pendiente de cierre |
+> | [#19](https://github.com/Micopay/coffee-payments/issues/19) | Cliente de LOBSTR | `MicopaySigner` contra `micopay/backend` |
+>
+> Dos issues nuevas en el otro repositorio, donde vive la billetera:
+> [**micopay#323**](https://github.com/Micopay/micopay-protocol/issues/323) endpoints de firma en `micopay/backend` · [**micopay#324**](https://github.com/Micopay/micopay-protocol/issues/324) bandeja de aprobación en `micopay/frontend` (Capacitor + React).
+>
+> **Los otros 17 issues no cambian.** La abstracción `Signer` se diseñó para que la elección de billetera no se filtrara al resto.
+
 ## Orden de ejecución
 
 ```
@@ -757,7 +772,7 @@ Los 20 issues están abiertos en [`Micopay/coffee-payments`](https://github.com/
 |---|---|---|---|---|---|
 | 01 | [#1](https://github.com/Micopay/coffee-payments/issues/1) | Spike: pagos básicos en Stellar Testnet | 0 | `research` `backend` `medium` | — |
 | 02 | [#2](https://github.com/Micopay/coffee-payments/issues/2) | Spike: escrow con transacciones preautorizadas | 0 | `research` `backend` `high` | — |
-| 03 | [#3](https://github.com/Micopay/coffee-payments/issues/3) | Spike: firma remota con LOBSTR | 0 | `research` `high` | — |
+| 03 | [#3](https://github.com/Micopay/coffee-payments/issues/3) | ♻️ Contrato de firma MicoPay y viabilidad de `htlc-core` | 0 | `research` `high` | — |
 | 04 | [#4](https://github.com/Micopay/coffee-payments/issues/4) | Protocolo LedgerClient y shim de XRPLClient | 0 | `backend` `medium` | — |
 | 06 | [#5](https://github.com/Micopay/coffee-payments/issues/5) | Modelo de datos multicadena | 0 | `backend` `high` | — |
 | 05 | [#6](https://github.com/Micopay/coffee-payments/issues/6) | StellarClient: pagos, saldo, activación | 1 | `backend` `high` | #1, #4 |
@@ -766,14 +781,14 @@ Los 20 issues están abiertos en [`Micopay/coffee-payments`](https://github.com/
 | 09 | [#9](https://github.com/Micopay/coffee-payments/issues/9) | WalletSession y conexión perezosa | 1 | `frontend` `high` | #4, #5 |
 | 14 | [#10](https://github.com/Micopay/coffee-payments/issues/10) | Historial, detalle y recibo por red | 1 | `frontend` `medium` | #5 |
 | 15 | [#11](https://github.com/Micopay/coffee-payments/issues/11) | Métricas de admin por red | 1 | `frontend` `good first issue` `low` | #5 |
-| 18 | [#12](https://github.com/Micopay/coffee-payments/issues/12) | Backend: endpoints de firma para Stellar | 1 | `backend` `high` | #3 |
+| 18 | [#12](https://github.com/Micopay/coffee-payments/issues/12) | ⛔ Movida a [micopay#323](https://github.com/Micopay/micopay-protocol/issues/323) — pendiente de cierre | 1 | `backend` `high` | — |
 | 10 | [#13](https://github.com/Micopay/coffee-payments/issues/13) | Selector de red y pago directo en Stellar | 2 | `frontend` `high` | #5, #6, #7, #9 |
 | 11 | [#14](https://github.com/Micopay/coffee-payments/issues/14) | Doble saldo en el dashboard | 2 | `frontend` `good first issue` `medium` | #6, #9 |
 | 12 | [#15](https://github.com/Micopay/coffee-payments/issues/15) | Escrow de Stellar en StellarClient | 2 | `backend` `high` | #2, #5, #6 |
 | 16 | [#16](https://github.com/Micopay/coffee-payments/issues/16) | camt.053 por red | 2 | `backend` `medium` | #5, #7 |
 | 13 | [#17](https://github.com/Micopay/coffee-payments/issues/17) | escrow_view multicadena | 3 | `frontend` `high` | #9, #15 |
 | 17 | [#18](https://github.com/Micopay/coffee-payments/issues/18) | SignDialog genérico y cierre de la Fase X5 | 4 | `frontend` `high` | #17 |
-| 19 | [#19](https://github.com/Micopay/coffee-payments/issues/19) | Cliente LOBSTR y cableado en la app | 5 | `frontend` `backend` `high` | #12, #13, #18 |
+| 19 | [#19](https://github.com/Micopay/coffee-payments/issues/19) | ♻️ `MicopaySigner`: firma de Stellar desde la app de MicoPay | 5 | `frontend` `backend` `high` | #3, #13, #18, micopay#323/#324 |
 | 20 | [#20](https://github.com/Micopay/coffee-payments/issues/20) | Limpieza, renombrado de producto, tests y docs | 6 | `backend` `documentation` `medium` | todos |
 
 **Ojo con la numeración:** el número de GitHub no coincide con el identificador XLM, porque el orden de publicación siguió el grafo de dependencias y no el orden de redacción. El identificador `[XLM-nn]` del título es el estable; el `#n` es el que enlaza GitHub.

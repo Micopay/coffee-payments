@@ -1,6 +1,24 @@
 # Plan de Implementación — Multicadena XRPL + Stellar y Billetera Dual
 
-**Origen:** Decisión de producto (2026-07-22). La plataforma deja de ser mono-cadena: opera XRPL y Stellar desde una misma interfaz, con billetera dual (Xaman para XRPL, LOBSTR para Stellar).
+**Origen:** Decisión de producto (2026-07-22). La plataforma deja de ser mono-cadena: opera XRPL y Stellar desde una misma interfaz, con billetera dual (Xaman para XRPL, la app de MicoPay para Stellar).
+
+> ## ♻️ Enmienda — 2026-07-22, misma fecha, después de publicar los issues
+>
+> **La billetera de Stellar deja de ser LOBSTR y pasa a ser la app de MicoPay.**
+>
+> LOBSTR era el único riesgo del plan que podía terminar en "no se puede": no expone un API de solicitudes de firma, WalletConnect v2 no tiene cliente *dapp* en Python, y su Vault exige multifirma sobre mainnet. Se controlaba un solo extremo.
+>
+> La app de MicoPay ya firma del lado del cliente con las llaves en el Keychain/Keystore nativo, vive en [`micopay/frontend`](https://github.com/Micopay/micopay-protocol/tree/main/micopay/frontend) (Capacitor + React + TypeScript) y tiene su backend en `micopay/backend`. Al ser primera parte, la pregunta deja de ser *si se puede* y pasa a ser *cuándo se construye*.
+>
+> **Qué cambia:**
+> - **S0.3** deja de investigar LOBSTR. Ahora especifica el contrato de firma delegada y verifica si el contrato Soroban [`contracts/htlc-core`](https://github.com/Micopay/micopay-protocol/tree/main/contracts/htlc-core) sirve para el escrow de calidad.
+> - **S7** deja de implementar un cliente de LOBSTR. Implementa `MicopaySigner` contra los endpoints de `micopay/backend`.
+> - Los endpoints y la pantalla de aprobación **no viven en este repositorio**: son [micopay-protocol#323](https://github.com/Micopay/micopay-protocol/issues/323) y [#324](https://github.com/Micopay/micopay-protocol/issues/324).
+>
+> **Qué NO cambia:** nada de S1 a S6. La abstracción `Signer` (D1) se diseñó justo para que la elección de billetera no se filtrara al resto del plan, y cumplió.
+>
+> **Posible simplificación pendiente de verificar:** si `htlc-core` acepta beneficiario fijo y `claim(preimage)` con ventana configurable, sustituye al diseño D4 de transacciones preautorizadas y mejora la paridad — el preimage vuelve a ser la llave igual que el fulfillment en XRPL, sin cuenta efímera ni reserva de 2 XLM. Lo decide S0.3.
+
 **Ejecutor previsto:** Claude. Documento autocontenido; no requiere leer otra conversación.
 **Concepto:** Todo lo que hoy existe sobre XRPL — pagos directos, escrow contra calidad, mensajería ISO 20022, historial, métricas — debe existir igual sobre Stellar. El operador elige la red en el momento de pagar; el resto de la plataforma no cambia de forma.
 
@@ -24,7 +42,7 @@ Dos ejes de abstracción independientes. **La red** (dónde se liquida) y **el f
    │ XRPLClient         │                      │ SeedSigner(XRPL)   │
    │ StellarClient      │                      │ SeedSigner(STELLAR)│
    └────────────────────┘                      │ XamanSigner        │
-                                               │ LobstrSigner       │
+                                               │ MicopaySigner      │
                                                └────────────────────┘
 ```
 
@@ -165,11 +183,10 @@ Tres scripts independientes en `scripts/`, sin importar nada de la app, siguiend
 3. **Pruebas negativas, obligatorias (I3):** confirmar que `TX_REEMBOLSO` es rechazada antes de `minTime`; que `TX_LIBERAR` ya no es válida después de ejecutarse `TX_REEMBOLSO` (y viceversa); y que con la llave efímera descartada nadie puede construir una transacción alternativa que saque los fondos.
 4. Imprimir el costo real en XLM de un ciclo completo.
 
-### S0.3 `scripts/spike_lobstr.py` — firma remota
+### S0.3 Contrato de firma MicoPay y viabilidad de `htlc-core` (ver enmienda)
 Probar, en este orden, hasta que uno funcione:
-1. **SEP-7**: construir `web+stellar:tx?xdr=<b64url>&callback=url:<endpoint>&msg=...&network_passphrase=...`, renderizar el QR en consola, escanear con LOBSTR y comprobar si la app lo interpreta y si entrega el XDR firmado al callback.
-2. **WalletConnect v2**: LOBSTR lo documenta oficialmente, pero no existe cliente *dapp* en Python (`pyWalletConnect` es del lado billetera). Documentar el alcance real de un sidecar Node con `@walletconnect/sign-client`.
-3. **API de LOBSTR Vault** (`POST https://vault.lobstr.co/api/transactions/`, sin autenticación): documentar que exige cuenta multifirma con el firmante del Vault y que opera en mainnet — probablemente incompatible con testnet.
+1. **Contrato de firma delegada**: especificar `POST /sign-requests`, `GET /sign-requests/{id}` y `POST /sign-requests/{id}/resolve` copiando la forma de la API de Xaman, para que el escritorio no tenga que ramificar. Diseñarlo como primitiva de plataforma, no como feature de esta app.
+2. **Viabilidad de `htlc-core`** para el escrow de calidad: ¿beneficiario fijo al crear el lock? ¿ventana temporal configurable por operación? ¿reembolso permissionless tras vencimiento? ¿desplegado en testnet y con qué ID? Si cumple, sustituye al diseño D4.
 
 **Criterio de aceptación:** S0.1 y S0.2 corren de punta a punta en testnet. **S0.3 puede fallar y eso es un resultado válido**, no un bloqueo: su conclusión se escribe en el encabezado del script y determina el alcance de la Fase S7. Todo lo demás avanza con modo seed.
 
@@ -279,14 +296,14 @@ Idempotente, con respaldo previo en `data/backups/` como los migradores existent
 
 ---
 
-## FASE S7 — Firma con LOBSTR (alcance definido por S0.3)
+## FASE S7 — Firma con la app de MicoPay (alcance definido por S0.3)
 
 Solo se ejecuta con el resultado del spike en la mano.
 
-- **Si SEP-7 funciona:** `backend/app.py` gana `POST /stellar/sign-requests` (guarda el XDR sin firmar, devuelve `{id, uri, qr}`), `POST /stellar/callback/{id}` (público, recibe el XDR firmado de LOBSTR) y `GET /stellar/sign-requests/{id}` (polling autenticado, mismo contrato que el de Xaman). `core/lobstr_client.py` replica `core/xaman_client.py`. El envío a Horizon lo hace el escritorio tras recuperar el XDR firmado.
+- Los endpoints (`POST /sign-requests`, `GET /sign-requests/{id}`, `POST /sign-requests/{id}/resolve`) viven en `micopay/backend` — [micopay-protocol#323](https://github.com/Micopay/micopay-protocol/issues/323) — y la pantalla de aprobación en `micopay/frontend` — [#324](https://github.com/Micopay/micopay-protocol/issues/324). Aquí solo se implementa `core/micopay_client.py`, réplica de `core/xaman_client.py` con otra URL base. El envío a Horizon lo hace el escritorio tras recuperar el XDR firmado.
 - **Si SEP-7 no funciona:** implementar el sidecar de WalletConnect v2 o, si tampoco es viable en el plazo, dejar Stellar en modo seed y documentar la limitación en `README.md`. **No es un bloqueo del plan**: S4 y S5 ya entregaron la funcionalidad completa.
 - `xaman_sign_dialog.py` se generaliza a `shared_ui/sign_dialog.py`: el QR, el polling, el timeout y `resolve_status()` ya son agnósticos; solo hay que parametrizar el cliente y el texto. **Aquí se cierra la Fase X5 de `PLAN_XAMAN.md`** (escrow firmado con Xaman), que necesita exactamente esta generalización.
-- `settings_dialog.py`: sección de LOBSTR junto a la de Xaman, con las mismas claves cifradas en `AppConfig`.
+- `settings_dialog.py`: sección de MicoPay junto a la de Xaman, con las mismas claves cifradas en `AppConfig`.
 
 **Verificación S7:** pago y escrow en Stellar firmados desde el teléfono, sin seed en la app; y el escrow XRPL con Xaman funcionando por fin.
 
@@ -306,14 +323,14 @@ Solo se ejecuta con el resultado del spike en la mano.
 
 | Fase | Contenido | Riesgo | Dependencia |
 |------|-----------|--------|-------------|
-| S0 | Spikes: pagos, escrow preautorizado y LOBSTR en testnet | Alto (por eso va primero) | Cuentas testnet |
+| S0 | Spikes: pagos, escrow preautorizado, contrato de firma y `htlc-core` | Alto (por eso va primero) | Cuentas testnet |
 | S1 | Capa `core/ledger/` + `StellarClient` | Medio | S0.1 |
 | S2 | Tabla `wallets`, `network` en pagos y escrows, migración | Medio-alto (toca datos) | S1 |
 | S3 | Alta de direcciones Stellar en ambas apps | Bajo | S2 |
 | S4 | Pago directo Stellar + selector de red + doble saldo | Medio | S1–S3 |
 | S5 | Escrow Stellar con transacciones preautorizadas | Alto | S0.2, S4 |
 | S6 | Historial, métricas y camt.053 por red | Bajo | S4 |
-| S7 | Firma con LOBSTR + cierre de la Fase X5 de Xaman | Alto (depende de S0.3) | S0.3, S4 |
+| S7 | Firma con la app de MicoPay + cierre de la Fase X5 de Xaman | Medio (ya no depende de un tercero) | S0.3, S4, micopay#323/#324 |
 | S8 | Limpieza, tests y documentación | Bajo | Todo probado |
 
 **Hito mínimo de valor:** S0–S4 ya entrega una plataforma multicadena real — el operador paga en XRPL o en Stellar desde la misma pantalla, con la misma mensajería ISO 20022. S5 iguala el escrow, S6 iguala la trazabilidad y S7 completa la billetera dual.
@@ -325,6 +342,6 @@ Solo se ejecuta con el resultado del spike en la mano.
 ## Apéndice — Lo que este plan deliberadamente NO hace
 
 - **No implementa Soroban.** Un contrato de escrow en Rust/WASM sería más flexible y más vistoso que el patrón de transacciones preautorizadas, pero exige toolchain de Rust y despliegue de contrato. El diseño de D4 es autocontenido en Python y suficiente. Si más adelante se quiere Soroban, entra como una tercera implementación de `LedgerClient.create_escrow` sin tocar el resto.
-- **No unifica las billeteras.** LOBSTR añadió soporte nativo de XRPL en abril de 2026, así que técnicamente podría cubrir ambas cadenas y sustituir a Xaman. Este plan mantiene Xaman para XRPL porque ya está implementado y probado; la consolidación en una sola billetera es una decisión de producto posterior, y la abstracción de `Signer` la deja abierta.
+- **No unifica las billeteras todavía.** Este plan mantiene Xaman para XRPL porque ya está implementado y probado. Cuando la app de MicoPay sume XRPL — está en su hoja de ruta — puede sustituir a Xaman y el operador dejaría de tener dos apps. La abstracción `Signer` deja esa puerta abierta sin tocar nada más.
 - **No toca tokens reales.** USDC y RLUSD siguen simulados en ambas redes. Un USDC real en Stellar exige que el productor establezca una *trustline* con el emisor antes de poder cobrar — un flujo de onboarding completo que merece su propio plan.
 - **No aborda puentes ni intercambio entre cadenas.** Multicadena aquí significa "dos rieles paralelos con una interfaz común", no interoperabilidad entre ellos.
