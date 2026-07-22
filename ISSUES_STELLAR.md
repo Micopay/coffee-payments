@@ -329,6 +329,7 @@ STELLAR → {"escrow_account": "G...", "release_xdr": "AAAA...", "refund_xdr": "
 - `ClrSysMmbId` toma `"XRPL"` o `"STELLAR"` según el pago.
 - El elemento de hash pasa a `<LedgerTxHash Network="STELLAR">`. **Para XRPL se conserva `<XRPLTxHash>`** de modo que los mensajes nuevos sigan siendo byte a byte comparables con los ya almacenados.
 - `generate_pacs002` recibe `result_code` genérico (`xrpl_result_code` queda como alias en desuso, sin romper llamadas existentes) y mapea también los códigos de Stellar: `tx_success` → ACSC; cualquier `tx_*` / `op_*` de error → RJCT con el código en `StsRsnInf`.
+- `generate_pacs002` acepta además cualquiera de las dos **llaves de liberación de escrow** en `escrow_fulfillment=`: el fulfillment PREIMAGE-SHA-256 de XRPL o el XDR preautorizado de Stellar, etiquetando cuál es. Vive aquí y no en XLM-13 porque es la misma función — dos issues no pueden reescribirla en paralelo.
 
 **Fuera de alcance.** `camt.053` por red (XLM-16). Cambios en quién llama al generador (XLM-10).
 
@@ -588,7 +589,7 @@ Si XLM-03 concluyó que SEP-7 no funciona, este issue cambia de alcance según s
 - Leer `chain_data` según el contrato C4 en vez de las columnas eliminadas.
 - `_update_buttons` ya depende de `cancel_after`, que es común a ambas cadenas: mantener esa lógica.
 - **Regla de tiempos:** en Stellar sí sería posible liberar después del vencimiento mientras nadie haya enviado `TX_REEMBOLSO`. Para no dar al operador dos reglas distintas, la interfaz mantiene el comportamiento de XRPL (liberar solo antes del vencimiento). Documentar la diferencia en el docstring del módulo.
-- El `pacs.002` ACSC transporta el XDR de liberación en el mismo lugar donde hoy va el fulfillment; `generate_pacs002(..., escrow_fulfillment=...)` pasa a aceptar cualquiera de los dos y etiquetar cuál es.
+- El `pacs.002` ACSC transporta el XDR de liberación en el mismo lugar donde hoy va el fulfillment. La firma que lo permite **ya viene hecha de XLM-07**; aquí solo se pasa el `release_xdr` en `escrow_fulfillment=`. **No modificar `core/iso_generator.py`** — esa función la reescribe XLM-07 y dos issues no pueden tocarla en paralelo.
 
 **Fuera de alcance.** Firmar escrows con billetera remota — sigue siendo modo seed hasta XLM-17 y XLM-19.
 
@@ -728,7 +729,7 @@ Fuente de verdad para evitar conflictos. Si dos issues quieren tocar el mismo ar
 | `core/ledger/xrpl.py`, `core/rates.py`, `core/xrpl_client.py` | XLM-04 | — |
 | `core/ledger/stellar.py` | XLM-05 | XLM-12 (escrow) |
 | `core/models.py`, `scripts/migrate_004_*` | XLM-06 | — |
-| `core/iso_generator.py` | XLM-07 | XLM-16 (camt.053), XLM-13 (pacs.002) |
+| `core/iso_generator.py` | XLM-07 | XLM-16 (camt.053) — **serializada**, XLM-16 depende de XLM-07 |
 | `producer_view.py` | XLM-06 (línea 323) | XLM-08 |
 | `user_management.py`, `core/utils.py` | XLM-08 | — |
 | `core/wallet_session.py`, `auth_flow.py`, `main_payment.py` | XLM-09 | XLM-19 (cableado) |
