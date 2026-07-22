@@ -17,7 +17,13 @@
 >
 > **Qué NO cambia:** nada de S1 a S6. La abstracción `Signer` (D1) se diseñó justo para que la elección de billetera no se filtrara al resto del plan, y cumplió.
 >
-> **Posible simplificación pendiente de verificar:** si `htlc-core` acepta beneficiario fijo y `claim(preimage)` con ventana configurable, sustituye al diseño D4 de transacciones preautorizadas y mejora la paridad — el preimage vuelve a ser la llave igual que el fulfillment en XRPL, sin cuenta efímera ni reserva de 2 XLM. Lo decide S0.3.
+> **`htlc-core` verificado el 22/07/2026 — D4 se mantiene.** El trait `HashedTimeLock` encaja en casi todo: beneficiario fijo al hacer `lock()` (cumple I3), `secret_hash` SHA-256 — **la misma preimagen de 32 bytes de `generate_escrow_condition()` sirve en las dos cadenas** —, `refund` permissionless tras vencimiento, ventana configurable y `platform_fee` que acepta 0.
+>
+> Lo que lo descarta: `micopay-escrow` y `atomic-swap` exigen `require_auth()` **del receptor** en `release()`. Eso obligaría al productor a invocar un contrato Soroban para cobrar; en XRPL no hace nada, solo recibe. No es un detalle de implementación, es un cambio de producto.
+>
+> No es un requisito de seguridad — el destino está fijo desde `lock()`, así que conocer el secreto ya *es* la autorización. La variante con `release` permissionless está propuesta en [micopay-protocol#325](https://github.com/Micopay/micopay-protocol/issues/325); si aterriza, sustituye a D4 sin tocar nada por encima de `StellarClient`.
+>
+> Otros hallazgos: un solo `TokenId` por despliegue (cada consumidor inicializa su instancia), y los vencimientos son por **secuencia de ledger**, no por reloj — hay deriva frente al `datetime` de `EscrowDetail.cancel_after`.
 
 **Ejecutor previsto:** Claude. Documento autocontenido; no requiere leer otra conversación.
 **Concepto:** Todo lo que hoy existe sobre XRPL — pagos directos, escrow contra calidad, mensajería ISO 20022, historial, métricas — debe existir igual sobre Stellar. El operador elige la red en el momento de pagar; el resto de la plataforma no cambia de forma.
