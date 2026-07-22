@@ -748,33 +748,35 @@ Fuente de verdad para evitar conflictos. Si dos issues quieren tocar el mismo ar
 
 ---
 
-## Hoja de publicación
+## Índice de issues publicadas
 
-Orden de publicación y etiquetas exactas. El orden importa: al publicar de arriba abajo, cada issue ya puede citar por número a los que la bloquean.
+Los 20 issues están abiertos en [`Micopay/coffee-payments`](https://github.com/Micopay/coffee-payments/issues) con la etiqueta `stellar-multichain`.
 
-| # | Título del issue | Etiquetas | Bloqueada por |
-|---|---|---|---|
-| 01 | `[XLM-01] Spike: pagos básicos en Stellar Testnet` | `research` `backend` `complexity: medium` `stellar-multichain` | — |
-| 02 | `[XLM-02] Spike: escrow con transacciones preautorizadas` | `research` `backend` `complexity: high` `stellar-multichain` | — |
-| 03 | `[XLM-03] Spike: firma remota con LOBSTR` | `research` `complexity: high` `stellar-multichain` | — |
-| 04 | `[XLM-04] Protocolo LedgerClient y shim de XRPLClient` | `backend` `complexity: medium` `stellar-multichain` | — |
-| 06 | `[XLM-06] Modelo de datos multicadena` | `backend` `complexity: high` `stellar-multichain` | — |
-| 05 | `[XLM-05] StellarClient: pagos, saldo, activación` | `backend` `complexity: high` `stellar-multichain` | 01, 04 |
-| 07 | `[XLM-07] ISO 20022 parametrizado por red` | `backend` `complexity: medium` `stellar-multichain` | 04 |
-| 08 | `[XLM-08] Alta de direcciones Stellar` | `frontend` `good first issue` `complexity: medium` `stellar-multichain` | 06 |
-| 09 | `[XLM-09] WalletSession y conexión perezosa` | `frontend` `complexity: high` `stellar-multichain` | 04, 06 |
-| 14 | `[XLM-14] Historial, detalle y recibo por red` | `frontend` `complexity: medium` `stellar-multichain` | 06 |
-| 15 | `[XLM-15] Métricas de admin por red` | `frontend` `good first issue` `complexity: low` `stellar-multichain` | 06 |
-| 18 | `[XLM-18] Backend: endpoints de firma para Stellar` | `backend` `complexity: high` `stellar-multichain` | 03 |
-| 10 | `[XLM-10] Selector de red y pago directo en Stellar` | `frontend` `complexity: high` `stellar-multichain` | 05, 06, 07, 09 |
-| 11 | `[XLM-11] Doble saldo en el dashboard` | `frontend` `good first issue` `complexity: medium` `stellar-multichain` | 05, 09 |
-| 12 | `[XLM-12] Escrow de Stellar en StellarClient` | `backend` `complexity: high` `stellar-multichain` | 02, 05, 06 |
-| 16 | `[XLM-16] camt.053 por red` | `backend` `complexity: medium` `stellar-multichain` | 06, 07 |
-| 13 | `[XLM-13] escrow_view multicadena` | `frontend` `complexity: high` `stellar-multichain` | 09, 12 |
-| 17 | `[XLM-17] SignDialog genérico y cierre de la Fase X5` | `frontend` `complexity: high` `stellar-multichain` | 13 |
-| 19 | `[XLM-19] Cliente LOBSTR y cableado en la app` | `frontend` `backend` `complexity: high` `stellar-multichain` | 10, 17, 18 |
-| 20 | `[XLM-20] Limpieza, tests finales y documentación` | `backend` `documentation` `complexity: medium` `stellar-multichain` | todos |
+| XLM | GitHub | Título | Ola | Etiquetas | Bloqueada por |
+|---|---|---|---|---|---|
+| 01 | [#1](https://github.com/Micopay/coffee-payments/issues/1) | Spike: pagos básicos en Stellar Testnet | 0 | `research` `backend` `medium` | — |
+| 02 | [#2](https://github.com/Micopay/coffee-payments/issues/2) | Spike: escrow con transacciones preautorizadas | 0 | `research` `backend` `high` | — |
+| 03 | [#3](https://github.com/Micopay/coffee-payments/issues/3) | Spike: firma remota con LOBSTR | 0 | `research` `high` | — |
+| 04 | [#4](https://github.com/Micopay/coffee-payments/issues/4) | Protocolo LedgerClient y shim de XRPLClient | 0 | `backend` `medium` | — |
+| 06 | [#5](https://github.com/Micopay/coffee-payments/issues/5) | Modelo de datos multicadena | 0 | `backend` `high` | — |
+| 05 | [#6](https://github.com/Micopay/coffee-payments/issues/6) | StellarClient: pagos, saldo, activación | 1 | `backend` `high` | #1, #4 |
+| 07 | [#7](https://github.com/Micopay/coffee-payments/issues/7) | ISO 20022 parametrizado por red | 1 | `backend` `medium` | #4 |
+| 08 | [#8](https://github.com/Micopay/coffee-payments/issues/8) | Alta de direcciones Stellar | 1 | `frontend` `good first issue` `medium` | #5 |
+| 09 | [#9](https://github.com/Micopay/coffee-payments/issues/9) | WalletSession y conexión perezosa | 1 | `frontend` `high` | #4, #5 |
+| 14 | [#10](https://github.com/Micopay/coffee-payments/issues/10) | Historial, detalle y recibo por red | 1 | `frontend` `medium` | #5 |
+| 15 | [#11](https://github.com/Micopay/coffee-payments/issues/11) | Métricas de admin por red | 1 | `frontend` `good first issue` `low` | #5 |
+| 18 | [#12](https://github.com/Micopay/coffee-payments/issues/12) | Backend: endpoints de firma para Stellar | 1 | `backend` `high` | #3 |
+| 10 | [#13](https://github.com/Micopay/coffee-payments/issues/13) | Selector de red y pago directo en Stellar | 2 | `frontend` `high` | #5, #6, #7, #9 |
+| 11 | [#14](https://github.com/Micopay/coffee-payments/issues/14) | Doble saldo en el dashboard | 2 | `frontend` `good first issue` `medium` | #6, #9 |
+| 12 | [#15](https://github.com/Micopay/coffee-payments/issues/15) | Escrow de Stellar en StellarClient | 2 | `backend` `high` | #2, #5, #6 |
+| 16 | [#16](https://github.com/Micopay/coffee-payments/issues/16) | camt.053 por red | 2 | `backend` `medium` | #5, #7 |
+| 13 | [#17](https://github.com/Micopay/coffee-payments/issues/17) | escrow_view multicadena | 3 | `frontend` `high` | #9, #15 |
+| 17 | [#18](https://github.com/Micopay/coffee-payments/issues/18) | SignDialog genérico y cierre de la Fase X5 | 4 | `frontend` `high` | #17 |
+| 19 | [#19](https://github.com/Micopay/coffee-payments/issues/19) | Cliente LOBSTR y cableado en la app | 5 | `frontend` `backend` `high` | #12, #13, #18 |
+| 20 | [#20](https://github.com/Micopay/coffee-payments/issues/20) | Limpieza, renombrado de producto, tests y docs | 6 | `backend` `documentation` `medium` | todos |
 
-**Antes de publicar:** `PLAN_STELLAR.md` y este documento tienen que estar en la rama por defecto del repositorio. Todos los issues los citan como contexto; sin ellos en GitHub, un contribuyente externo no puede tomar el trabajo.
+**Ojo con la numeración:** el número de GitHub no coincide con el identificador XLM, porque el orden de publicación siguió el grafo de dependencias y no el orden de redacción. El identificador `[XLM-nn]` del título es el estable; el `#n` es el que enlaza GitHub.
+
+**Para arrancar mañana:** #1, #2, #3, #4 y #5 no tienen bloqueadores. **#5 primero** — desbloquea 7 issues.
 
 **Idioma:** español, consistente con `PLAN_STELLAR.md`, con la UI de la plataforma y con el resto de la documentación que el contribuyente necesita leer para trabajar. Los docstrings y comentarios del código siguen en inglés, según la regla del proyecto.
