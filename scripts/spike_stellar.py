@@ -12,6 +12,11 @@ por ejemplo 123e4567-e89b-12d3-a456-426614174000) no puede almacenarse directame
 La solución consiste en convertir el UUID a sus 16 bytes binarios (UUID.bytes) y completar el resto con ceros hasta alcanzar 32 bytes. 
 Ese valor se envía utilizando un MemoHash, mediante TransactionBuilder.add_hash_memo(...).
 
+IMPORTANTE para quien lea el memo de vuelta (ver XLM-05 / StellarClient): los 16 bytes de padding
+NO son significativos, son solo relleno de ceros para cumplir el tamaño fijo de MemoHash (32 bytes).
+Para recuperar el UETR a partir del memo leído de una transacción, tomar únicamente los primeros
+16 bytes (memo_hash[:16]) y reconstruir con uuid.UUID(bytes=memo_hash[:16]).
+
 2. ¿Cuándo usar Payment y cuándo CreateAccount?
 Aquí existe una diferencia importante entre XRPL y Stellar.
 En XRPL una operación Payment puede crear automáticamente una cuenta si aún no existe una y el pago cubre la reserva mínima.
