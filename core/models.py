@@ -201,22 +201,24 @@ class Producer(Base):
 def _sync_wallet_after_insert(mapper, connection, target):
     """Ensure newly persisted Producer or User gets a Wallet record if xrpl_address was provided."""
     if target._legacy_xrpl_address and target.id:
-        session = object_session(target)
-        if session:
-            existing = session.query(Wallet).filter_by(
-                owner_type=target._owner_type,
-                owner_id=target.id,
-                network="XRPL"
-            ).first()
-            if not existing:
-                w = Wallet(
-                    owner_type=target._owner_type,
-                    owner_id=target.id,
-                    network="XRPL",
-                    address=target._legacy_xrpl_address,
-                    is_default=True
-                )
-                session.add(w)
+        from sqlalchemy import text
+        res = connection.execute(
+            text("SELECT id FROM wallets WHERE owner_type = :ot AND owner_id = :oid AND network = 'XRPL'"),
+            {"ot": target._owner_type, "oid": target.id}
+        ).fetchone()
+        if not res:
+            connection.execute(
+                text("""
+                    INSERT INTO wallets (owner_type, owner_id, network, address, is_default, created_at)
+                    VALUES (:ot, :oid, 'XRPL', :addr, 1, :now)
+                """),
+                {
+                    "ot": target._owner_type,
+                    "oid": target.id,
+                    "addr": target._legacy_xrpl_address,
+                    "now": datetime.now(timezone.utc)
+                }
+            )
 
 event.listen(User, "after_insert", _sync_wallet_after_insert)
 event.listen(Producer, "after_insert", _sync_wallet_after_insert)
