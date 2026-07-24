@@ -1,7 +1,13 @@
 """
 Generic QThread worker for running functions off the main UI thread.
 """
-from PySide6.QtCore import QThread, Signal
+try:
+    from PySide6.QtCore import QThread, Signal
+except ImportError:
+    class QThread: pass
+    class Signal:
+        def __init__(self, *args, **kwargs): pass
+        def emit(self, *args, **kwargs): pass
 
 
 class FunctionWorker(QThread):
