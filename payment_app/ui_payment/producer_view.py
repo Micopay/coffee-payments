@@ -318,9 +318,11 @@ class ProducerManagementWidget(QWidget):
                 )
                 return
             
-            # Check if XRPL address already exists
+            # Check if XRPL address already exists via Wallet
             session = get_session()
-            existing = session.query(Producer).filter_by(xrpl_address=xrpl).first()
+            from core.models import Wallet
+            wallet = session.query(Wallet).filter_by(network="XRPL", address=xrpl, owner_type="producer").first()
+            existing = session.query(Producer).get(wallet.owner_id) if wallet else None
             
             if existing:
                 QMessageBox.warning(

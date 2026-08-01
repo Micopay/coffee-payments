@@ -24,12 +24,16 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QProgressBar, QMessageBox,
-)
-from PySide6.QtCore import Qt, QTimer, QUrl
-from PySide6.QtGui import QPixmap, QDesktopServices
+try:
+    from PySide6.QtWidgets import (
+        QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+        QProgressBar, QMessageBox,
+    )
+    from PySide6.QtCore import Qt, QTimer, QUrl
+    from PySide6.QtGui import QPixmap, QDesktopServices
+except ImportError:
+    QDialog = QVBoxLayout = QHBoxLayout = QLabel = QPushButton = QProgressBar = QMessageBox = object
+    Qt = QTimer = QUrl = QPixmap = QDesktopServices = object
 
 from core.xaman_client import XamanClient
 from shared_ui.workers import FunctionWorker
