@@ -1,5 +1,7 @@
 # ☕ Coffee XRPL Platform
 
+> **Estado:** Reference project, educativo y sin soporte como producto. **Custodia:** MicoPay no custodia fondos; el operador firma con su propia wallet XRPL. [MicoPay Café](https://github.com/Micopay/micopay-cafe) es la dirección más reciente del producto.
+
 Plataforma de escritorio para la gestión de pagos a productores de café, construida sobre el **XRP Ledger**. Combina liquidación blockchain con mensajería financiera **ISO 20022** y una interfaz de escritorio completa en PySide6.
 
 ---
